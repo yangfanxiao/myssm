@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace必须指向Dao接口    -->
+
+<mapper namespace="com.yitianyike.myssm.dao.SchoolDao">
+<resultMap id="school" type="com.yitianyike.myssm.entity.vo.SchoolVo">
+		<result property="name" column="name" />
+		<result property="creat_time" column="creat_time" />
+		<result property="type" column="type" />
+	</resultMap>
+
+<sql id="query_times_or">  
+    <if test="times!=null">  
+        <!-- 使用foreach遍历传入ids   
+        collection指定输入对象中集合属性  
+        item每次遍历生成的对象名  
+        open开始遍历时要拼接的串  
+        close开始遍历时要拼接的串  
+        separator遍历的两个对象中间需要拼接的串  
+        -->  
+        <!-- 使用实现下边的sql拼接   
+        WHERE (id=1 OR id=3 OR id=5)-->  
+        <foreach collection="times" item="creat_time" open="AND (" close=")" separator="OR">  
+            <!-- 每次遍历要拼接的串 -->  
+            creat_time=#{creat_time}  
+        </foreach>  
+    </if>  
+</sql>  
+
+<sql id="query_times_in">  
+    <if test="times!=null">  
+        
+        <!-- 使用实现下边的sql拼接   
+        WHERE creat_time IN(2017,2016) -->  
+        <foreach collection="times" item="creat_time" open="AND creat_time IN(" close=")" separator=",">  
+            <!-- 每次遍历要拼接的串 -->  
+            #{creat_time}  
+        </foreach>  
+    </if>  
+</sql>  
+
+<insert id="insert">
+		INSERT INTO school 
+	
+		 VALUES (null,#{name},#{creat_time},#{type})
+		 
+	</insert>
+	
+<delete id="delete">
+		DELETE FROM school where name =#{name}
+</delete>
+
+  <select id="findAll" resultMap="school" >
+	select name ,  creat_time from school
+	<where>
+		<if test="name!=null">
+		  	name like CONCAT('%',#{name},'%')
+		</if>
+		<if test="creat_time!=null">
+		  	and creat_time  = #{creat_time}
+		</if>
+		
+	</where> 
+  </select>
+  
+  
+  <select id="querySchoolVO" parameterType="com.yitianyike.myssm.entity.vo.SchoolVo"  resultMap="school" >
+	select * from school
+	<where>
+		<if test="name!=null">
+		  	name like CONCAT('%',#{name},'%')
+		  	  <!--  模糊查询name -->
+		</if>
+		<if test="creat_time!=null">
+		  	and creat_time  = #{creat_time}    <!--  精确查询时间 -->
+		</if>
+		
+	</where> 
+  </select>
+<!--   高级查询 -->
+  <select id="querySchool" parameterType="com.yitianyike.myssm.entity.vo.SchoolVo"  resultMap="school" >
+	select * from school
+	<where>
+		<if test="name!=null">
+		 and 	name like CONCAT('%',#{name},'%')  <!--  模糊查询name -->
+		</if>
+<!-- 		<if test="times!=null"> -->
+<!-- 		<foreach collection="times" item="time" open="and creat_time IN(" close=")" separator=","></foreach> -->
+<!-- 		 creat_time = #{time}     精确查询时间 -->
+<!-- 		</if> -->
+		 <include refid="query_times_in"></include>  
+	</where> 
+  </select>
+  
+   <select id="getSchoolName" parameterType="String" resultMap="school" >
+	select name ,  creat_time from school
+	
+  </select>
+  
+   <select id="findSchoolByName" parameterType="string" resultMap="school" >
+	select * from school  
+	<where>
+		<if test="name != null">
+<!-- 		  	name like CONCAT('%',#{name},'%') -->
+		 name=#{name}
+		</if>
+	</where> 
+  </select>
+	
+  <select id="get" resultMap="school" >
+	select name from system where id =#{id}
+	
+  </select>
+  
+  <select id="findBySysIds" resultType="String" >
+	select name from system where id in 
+	<foreach item="ids" index="index" collection="list" open="("
+            separator="," close=")">
+            #{ids}  
+         </foreach>
+  </select>
+	
+	
+	
+	<update id="update">
+		UPDATE school
+			<set>
+				<if test="name!=null">
+					name = #{name},
+				</if>
+				<if test="creat_time!=null">
+					creat_time = #{creat_time}
+				</if>
+			</set>
+			where id = #{id}
+	</update>
+	
+</mapper>

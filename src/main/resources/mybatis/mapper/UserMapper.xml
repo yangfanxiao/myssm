@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yitianyike.myssm.dao.UserDao">
+
+
+	<select id="getPassWord" resultType="String">
+		SELECT password FROM USER WHERE name=#{name}
+	</select>
+	
+	<insert id="insertUser">
+		INSERT INTO USER VALUES (NULL,#{name},#{password},#{birthday},#{sex})
+	</insert>
+</mapper>

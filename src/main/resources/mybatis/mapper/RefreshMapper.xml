@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yitianyike.myssm.dao.RefreshDao">
+<!--实体映射 -->
+	
+	<!-- 创建  -->
+	<insert id="insertTMS">
+		INSERT INTO cms_tms_column(column_name,column_code)  values (
+			#{column_name},#{column_code})
+	</insert>
+
+	<insert id="insertColumn">
+		insert into cms_tms_column (column_name,column_code,history_id)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.column_name},#{item.column_code},0)
+		</foreach>
+	</insert>
+	
+	<update id="updateColumnHistoryID">
+		UPDATE cms_tms_column SET history_id=history_id+1
+	</update>
+	
+	<insert id="insertSport">
+		insert into cms_tms_sport (name,history_id)
+		values
+		<foreach collection="list" item="name" index="index" separator=",">
+			(#{name},0)
+		</foreach>
+	</insert>
+	
+	<update id="updateSportHistoryID">
+		UPDATE cms_tms_sport SET history_id=history_id+1
+	</update>
+	
+	<select id="getFootboll" resultType="string">
+		SELECT DISTINCT hostname FROM tms_sportfootball 
+	</select>
+
+	<select id="getNBA" resultType="string">
+		SELECT DISTINCT  hostname FROM tms_sportnba 
+	</select>
+</mapper>

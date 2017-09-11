@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yitianyike.myssm.dao.StudentDao">
+
+	<resultMap id="student" type="com.yitianyike.myssm.entity.StudentPojo">
+		<result property="_id" column="id" />
+		<result property="name" column="name" />
+		<result property="school" column="school" />
+		<result property="age" column="age" />
+		<result property="location" column="location" />
+	</resultMap>
+
+	<resultMap id="school" type="com.yitianyike.myssm.entity.vo.SchoolVo">
+		<result property="name" column="name" />
+		<result property="creat_time" column="creat_time" />
+		<result property="type" column="type" />
+	</resultMap>
+
+	<resultMap id="studentVO" type="com.yitianyike.myssm.entity.vo.StudentVo">
+		<result property="_id" column="id" />
+		<result property="name" column="name" />
+		<result property="school" column="school" />
+		<result property="age" column="age" />
+		<result property="location" column="location" />
+		<result property="type" column="type" />
+		<result property="creat_time" column="creat_time" />
+	</resultMap>
+	
+	<sql id="query_ages_or">
+		<if test="array!=null">
+			<!-- 传递一个 List 实例或者数组作为参数对象传给 MyBatis,MyBatis 会自动将它包装在一个 Map 中,用名称在作为键。 
+				List 实例将会以“list” 作为键,而数组实例将会以“array”作为键 -->
+			<!-- 使用foreach遍历传入ids collection指定输入对象中集合属性 item每次遍历生成的对象名 open开始遍历时要拼接的串 
+				close开始遍历时要拼接的串 separator遍历的两个对象中间需要拼接的串 -->
+			<!-- 使用实现下边的sql拼接 WHERE (age=1 OR age=3 OR age=5) -->
+			<foreach collection="array" item="age" open="(" close=")"
+				separator="OR">
+				<!-- 每次遍历要拼接的串 -->
+				age=#{age}
+			</foreach>
+		</if>
+	</sql>
+
+	<select id="findSchoolByStudentName" resultMap="studentVO">
+		SELECT a.*,b.* FROM
+		school a, student b WHERE a.`name` =b.`school` and b.name =#{name};
+	</select>
+
+
+	<select id="getStudentByAge" resultMap="student">
+		SELECT * FROM student
+		<where>
+			<include refid="query_ages_or"></include>
+		</where>
+	</select>
+
+</mapper>

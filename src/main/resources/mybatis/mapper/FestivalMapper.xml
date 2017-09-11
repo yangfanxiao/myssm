@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yitianyike.myssm.dao.FestivalDao">
+<!--实体映射 -->
+	<resultMap id="festival" type="com.yitianyike.myssm.entity.FestivalPojo">
+		<id property="id" column="id" />
+		<result  property="festival_date" column="festival_date" />
+		<result  property="festival_name" column="festival_name" />
+		<result  property="keyword" column="keyword" />
+		<result  property="festival_url" column="festival_url" />
+		<result  property="create_user" column="create_user" />
+		<result  property="create_time" column="create_time" />
+		<result  property="update_user" column="update_user" />
+		<result  property="update_time" column="update_time" />
+		<result  property="channel_code" column="channel_code" />
+	</resultMap>
+	
+	
+	<!-- 创建  -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="com.yitianyike.myssm.entity.FestivalPojo">
+		INSERT INTO cms_festival(festival_date,festival_name,keyword,festival_url,create_user,create_time)  values (
+			#{festival_date},#{festival_name},#{keyword},#{festival_url},#{create_user},#{create_time})
+	</insert>
+	
+	
+	<!-- 批量导入  -->
+	<insert id="insertList">
+		INSERT INTO cms_festival(festival_date,festival_name,keyword,festival_url,create_user,create_time)  values 
+		<foreach collection="list" item="item" index="index" separator=",">
+		(#{item.festival_date},#{item.festival_name},#{item.keyword},#{item.festival_url},#{item.create_user},#{item.create_time})
+		</foreach>
+	</insert>
+	
+	<delete id="delete">
+		DELETE FROM cms_festival
+		<where>
+			id=#{id}
+		</where>
+	</delete>
+
+	<delete id="deleteByDate">
+		DELETE FROM cms_festival
+		<where>
+			<if test="list">
+				<foreach collection="list" item="festival_date" open="(" close=")"
+					separator="OR">
+					<!-- 每次遍历要拼接的串 -->
+					festival_date=#{festival_date}
+				</foreach>
+			</if>
+		</where>
+	</delete>
+	
+	
+	<!-- 编辑更新-->
+	<update id="update">
+		update cms_festival
+		<set>
+			festival_name = #{festival_name},keyword = #{keyword},festival_url = #{festival_url},
+			update_user= #{update_user},update_time= #{update_time}
+		</set>
+		<where>
+			id=#{id}
+		</where>
+	</update>
+	
+	<!-- 按条件查询 -->
+	<select id="getList" parameterType="com.yitianyike.myssm.entity.vo.FestivalVo"
+		resultMap="festival">
+		SELECT a.* FROM cms_festival a
+		<where>
+			<if test="festival_name!=null and festival_name!=''">
+				and a.festival_name like CONCAT('%',#{festival_name},'%')
+			</if>
+			<if test="keyword!=null and keyword!=''">
+				and a.keyword like CONCAT('%',#{keyword},'%')
+			</if>
+			<if test="festival_date!=null and festival_date!=''">
+				and a.festival_date like CONCAT(#{festival_date},'%')
+			</if>
+			<if test="date_start!=null and date_start !='' ">
+				and a.festival_date <![CDATA[>=]]>
+				#{date_start}
+			</if>
+			<if test="date_end!=null and date_end !='' ">
+				and a.festival_date <![CDATA[<=]]>
+				#{date_end}
+			</if>
+			<if test="create_user!=null and create_user !='' ">
+				and a.create_user = #{create_user}
+			</if>
+		</where>
+		order by id desc
+		<if test="pn!=null and ps !=null ">
+			LIMIT #{pn},#{ps}
+		</if>
+	</select>
+
+	<!-- 按条件查询锚点的总个数 -->
+	<select id="getTotal" parameterType="com.yitianyike.myssm.entity.vo.FestivalVo"
+		resultType="int">
+		SELECT COUNT(a.`id`) FROM cms_festival a 
+		<where>
+		<if test="festival_name!=null and festival_name!=''">
+				and a.festival_name like CONCAT('%',#{festival_name},'%')
+			</if>
+			<if test="keyword!=null and keyword!=''">
+				and a.keyword like CONCAT('%',#{keyword},'%')
+			</if>
+			
+			<if test="festival_date!=null and festival_date!=''">
+				and a.festival_date like CONCAT(#{festival_date},'%')
+			</if>
+			<if test="date_start!=null and date_start !='' ">
+				and a.festival_date <![CDATA[>=]]>
+				#{date_start}
+			</if>
+			<if test="date_end!=null and date_end !='' ">
+				and a.festival_date <![CDATA[<=]]>
+				#{date_end}
+			</if>
+			<if test="create_user!=null and create_user !='' ">
+				and a.create_user = #{create_user}
+			</if>
+		</where>
+	</select>
+	
+	<select id="isRepeatedlyFestival" resultType="int">
+		SELECT COUNT(id) FROM cms_festival
+		<where>
+			<if test="festival_date != null">
+				and festival_date=#{festival_date}
+			</if>
+			<if test="festival_name != null">
+				and festival_name=#{festival_name}
+			</if>
+			<if test="id != null">
+				and id!=#{id}
+			</if>
+		</where>
+	</select>
+
+</mapper>
